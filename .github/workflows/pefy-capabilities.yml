@@ -3,7 +3,11 @@ name: PEFY Capability Validation
 on:
   push:
     branches:
+      - master
       - "pefy/**"
+    paths:
+      - "pefy/**"
+      - ".github/workflows/pefy-capabilities.yml"
   pull_request:
     paths:
       - "pefy/**"
