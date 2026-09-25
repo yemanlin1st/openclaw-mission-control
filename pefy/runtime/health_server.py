@@ -127,6 +127,17 @@ def run_checks():
     core_ok = RESULT["graphify"].get("installed") and RESULT["agentswarms"].get("installed") and RESULT["agentswarms"].get("revision_verified")
     RESULT["status"] = "ok" if core_ok else "degraded"
     RESULT["checked_at_unix"] = int(time.time())
+    snapshot = Path("/opt/pefy/runtime-status.json")
+    snapshot.write_text(json.dumps(RESULT, indent=2, sort_keys=True))
+    print("PEFY capability checks complete: " + json.dumps({
+        "status": RESULT["status"],
+        "graphify_execution_verified": RESULT["graphify"].get("execution_verified"),
+        "graphify_graph_json_created": RESULT["graphify"].get("graph_json_created"),
+        "agentswarms_installed": RESULT["agentswarms"].get("installed"),
+        "agentswarms_revision_verified": RESULT["agentswarms"].get("revision_verified"),
+        "agentswarms_supply_chain_gate_passed": RESULT["agentswarms"].get("supply_chain_gate_passed"),
+        "supabase_dedicated_backend_configured": RESULT["supabase"].get("dedicated_backend_configured"),
+    }, sort_keys=True), flush=True)
 
 class Handler(BaseHTTPRequestHandler):
     def _write(self, code, body):
