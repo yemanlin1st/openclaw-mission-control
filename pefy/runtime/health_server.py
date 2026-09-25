@@ -69,6 +69,21 @@ def verify_agentswarms():
         actual = subprocess.check_output(["git", "-C", str(home), "rev-parse", "HEAD"], text=True, timeout=10).strip()
     except Exception:
         pass
+
+    audit_counts = {"info": 0, "low": 0, "moderate": 0, "high": 0, "critical": 0, "total": 0}
+    audit_path = Path("/opt/pefy/agentswarms-npm-audit-prod.json")
+    if audit_path.exists():
+        try:
+            audit = json.loads(audit_path.read_text())
+            meta = audit.get("metadata", {}).get("vulnerabilities", {})
+            for key in audit_counts:
+                audit_counts[key] = int(meta.get(key, 0) or 0)
+        except Exception:
+            audit_counts["parse_error"] = True
+
+    supply_chain_gate = audit_counts.get("critical", 0) == 0 and audit_counts.get("high", 0) == 0
+    runtime_requested = os.getenv("AGENTSWARMS_ENABLED", "false").lower() == "true"
+
     return {
         "installed": package.exists() and node_modules.exists(),
         "source_present": package.exists(),
@@ -78,7 +93,10 @@ def verify_agentswarms():
         "revision_verified": bool(actual and expected and actual == expected),
         "license": "Elastic-2.0",
         "mode": "internal-governed-workbench",
-        "application_runtime_enabled": os.getenv("AGENTSWARMS_ENABLED", "false").lower() == "true",
+        "production_dependency_audit": audit_counts,
+        "supply_chain_gate_passed": supply_chain_gate,
+        "application_runtime_requested": runtime_requested,
+        "application_runtime_enabled": runtime_requested and supply_chain_gate,
     }
 
 def verify_supabase():
