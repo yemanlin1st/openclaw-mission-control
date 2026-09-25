@@ -26,10 +26,15 @@ RUN git clone --filter=blob:none https://github.com/AgentSwarms-fyi/agentswarms.
  && git fetch --depth 1 origin "$AGENTSWARMS_COMMIT" \
  && git checkout --detach "$AGENTSWARMS_COMMIT" \
  && npm ci \
- && (npm audit fix --omit=dev || true) \
+ && (npm audit fix --package-lock-only --omit=dev || true) \
+ && npm pkg set "dependencies.nodemailer=10.0.10" \
+                "dependencies.pdfjs-dist=4.10.38" \
+                "dependencies.pptxgenjs=4.0.0" \
+                "overrides.tar=7.5.22" \
+ && npm install \
  && npm run typecheck \
  && npm test \
- && node -e "const p=require('./package.json'); if(p.name!=='agentswarms') process.exit(2); console.log('AgentSwarms '+p.version+' installed and regression checks passed')"
+ && node -e "const p=require('./package.json'); if(p.name!=='agentswarms') process.exit(2); console.log('AgentSwarms '+p.version+' hardened overlay installed and regression checks passed')"
 
 RUN mkdir -p /opt/pefy \
  && cd /opt/agentswarms \
