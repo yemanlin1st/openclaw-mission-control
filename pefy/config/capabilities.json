@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "graphify": {
     "enabled": true,
     "mode": "governed-adapter",
@@ -20,6 +20,15 @@
       "proprietary_code": "local-ast-first",
       "documents_and_images": "external-llm-only-after-policy-approval",
       "provenance_required": true
+    },
+    "resilience_profile": {
+      "criticality_tier": "tier2_standard_business",
+      "fallback": [
+        "local-ast-parser",
+        "last-known-good-artifacts"
+      ],
+      "state": "ephemeral-runtime-output-persist-or-regenerate",
+      "rebuildable": true
     }
   },
   "agentswarms": {
@@ -52,6 +61,15 @@
       "typecheck_required": true,
       "tests_required": true,
       "dedicated_supabase_required": true
+    },
+    "resilience_profile": {
+      "criticality_tier": "tier2_standard_business",
+      "runtime_state": "quarantined",
+      "fallback": [
+        "OmegaAgentSwarms-governed-adapter",
+        "OmegaMissionControl-native-swarm"
+      ],
+      "state_recovery": "dedicated-backend-plus-event/evidence-ledger-required-before-runtime-enable"
     }
   },
   "free_ai_fabric": {
@@ -84,7 +102,12 @@
       "modality",
       "cost",
       "availability"
-    ]
+    ],
+    "resilience_profile": {
+      "criticality_tier": "tier0_control_plane",
+      "strategy": "provider-neutral-multi-provider-plus-local-fallback",
+      "continuity": "quota-and-outage-aware-routing"
+    }
   },
   "dark_forest_safeguards": {
     "enabled": true,
@@ -100,6 +123,153 @@
       "segregation",
       "stop-loss-first",
       "preserve-evidence"
-    ]
+    ],
+    "resilience_profile": {
+      "criticality_tier": "tier1_critical_business",
+      "fallback": [
+        "local-defensive-rules",
+        "manual-incident-runbook"
+      ],
+      "evidence_preservation": true
+    }
+  },
+  "resilience_fabric": {
+    "enabled": true,
+    "name": "OmegaResilienceFabric",
+    "applies_to": [
+      "skills",
+      "tools",
+      "agents",
+      "agentic-workflows",
+      "MCPs",
+      "APIs",
+      "providers",
+      "datastores",
+      "runtimes",
+      "connectors",
+      "queues",
+      "documents",
+      "models",
+      "automations"
+    ],
+    "inheritance": "mandatory-by-default",
+    "control_parents": [
+      "OmegaMissionControl",
+      "OmegaOmniRoute",
+      "OmegaCSF",
+      "GARKAEL"
+    ],
+    "objectives": {
+      "availability": "continue-service-through-faults",
+      "continuity": "preserve-critical-business-capability",
+      "disaster_recovery": "restore-services-and-data-to-known-good-state",
+      "graceful_degradation": true,
+      "no_silent_data_loss": true
+    },
+    "criticality_profiles": {
+      "tier0_control_plane": {
+        "rto_minutes": 15,
+        "rpo_minutes": 5,
+        "minimum_redundancy": "multi-provider-or-local-fallback"
+      },
+      "tier1_critical_business": {
+        "rto_minutes": 60,
+        "rpo_minutes": 15,
+        "minimum_redundancy": "warm-standby-plus-degraded-mode"
+      },
+      "tier2_standard_business": {
+        "rto_minutes": 240,
+        "rpo_minutes": 60,
+        "minimum_redundancy": "restart-plus-alternate-provider"
+      },
+      "tier3_noncritical": {
+        "rto_minutes": 1440,
+        "rpo_minutes": 1440,
+        "minimum_redundancy": "backup-and-rebuild"
+      }
+    },
+    "runtime_patterns": [
+      "health-check-and-watchdog",
+      "circuit-breaker",
+      "bounded-retry-with-jitter",
+      "bulkhead-isolation",
+      "idempotency",
+      "queue-or-outbox-for-durable-work",
+      "provider-failover",
+      "local-or-offline-fallback",
+      "read-only-degraded-mode",
+      "checkpoint-and-resume",
+      "safe-restart",
+      "dependency-timeout",
+      "backpressure",
+      "state-externalization",
+      "observability-and-evidence"
+    ],
+    "data_protection": {
+      "baseline": "3-2-1-1-0",
+      "encrypted_backups": true,
+      "immutable_or_worm_copy_required_for_tier0_tier1": true,
+      "versioning": true,
+      "integrity_verification": true,
+      "restore_tests_required": true,
+      "restore_test_frequency_days": {
+        "tier0_control_plane": 30,
+        "tier1_critical_business": 30,
+        "tier2_standard_business": 90,
+        "tier3_noncritical": 180
+      },
+      "backup_failure_is_alertable": true,
+      "backup_is_not_considered_valid_until_restore_verified": true,
+      "secrets": "never-store-in-repository-or-backup-logs"
+    },
+    "continuity_modes": [
+      "normal",
+      "degraded",
+      "offline",
+      "read-only",
+      "manual-assisted",
+      "disaster-recovery",
+      "reconciliation"
+    ],
+    "failover_order": [
+      "same-provider-secondary-instance",
+      "alternate-authorized-provider",
+      "local-self-hosted-runtime",
+      "cached-read-only-mode",
+      "queued-delayed-execution",
+      "human-assisted-manual-procedure"
+    ],
+    "recovery_contract": {
+      "required_fields": [
+        "criticality_tier",
+        "dependencies",
+        "fallback_chain",
+        "state_location",
+        "backup_method",
+        "rto",
+        "rpo",
+        "health_signal",
+        "recovery_runbook",
+        "owner",
+        "evidence_location"
+      ],
+      "configuration_and_code": "git-versioned-and-reproducible",
+      "infrastructure": "rebuildable-from-declarative-config-where-possible",
+      "data": "recoverable-from-verified-backup-or-event-log",
+      "in_flight_work": "checkpointed-or-idempotently-replayable",
+      "post_recovery": "reconcile-audit-and-integrity-check"
+    },
+    "admission_gate": {
+      "block_new_capability_if": [
+        "no-health-signal",
+        "no-defined-fallback-for-tier0-tier1",
+        "stateful-without-backup-plan",
+        "non-idempotent-retry-without-protection",
+        "single-provider-hard-dependency-without-accepted-risk",
+        "no-recovery-owner-or-runbook-for-critical-capability"
+      ]
+    },
+    "skill": "pefy/skills/resilience/SKILL.md",
+    "policy": "pefy/config/resilience-policy.json"
   }
 }
