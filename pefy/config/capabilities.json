@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "graphify": {
     "enabled": true,
     "mode": "governed-adapter",
@@ -41,7 +41,18 @@
       "OmegaCSF"
     ],
     "consequential_actions": "human-approval-required",
-    "status_endpoint": "/status"
+    "status_endpoint": "/status",
+    "runtime_state": "quarantined",
+    "runtime_exposure_allowed": false,
+    "quarantine_reason": "Production dependency audit retains High vulnerabilities after safe hardening attempts; upstream application must not be exposed until security gate and regression tests pass.",
+    "fallback_adapter": "pefy/skills/agentswarms/SKILL.md",
+    "security_gate": {
+      "critical_max": 0,
+      "high_max": 0,
+      "typecheck_required": true,
+      "tests_required": true,
+      "dedicated_supabase_required": true
+    }
   },
   "free_ai_fabric": {
     "enabled": true,
