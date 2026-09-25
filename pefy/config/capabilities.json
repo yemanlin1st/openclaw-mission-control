@@ -1,11 +1,12 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "graphify": {
     "enabled": true,
     "mode": "governed-adapter",
     "upstream": "https://github.com/Graphify-Labs/graphify",
     "package": "graphifyy",
-    "install_command": "python -m pip install graphifyy",
+    "version_pin": "0.9.67",
+    "install_command": "python -m pip install graphifyy==0.9.67",
     "verify_command": "graphify --help",
     "outputs": [
       "graphify-out/graph.json",
@@ -20,6 +21,27 @@
       "documents_and_images": "external-llm-only-after-policy-approval",
       "provenance_required": true
     }
+  },
+  "agentswarms": {
+    "enabled": true,
+    "role": "internal-governed-workbench",
+    "authoritative_control_plane": false,
+    "upstream": "https://github.com/AgentSwarms-fyi/agentswarms",
+    "pinned_commit": "95179372d0c4dd72b300639a7a17556beca8651e",
+    "upstream_version": "1.5.0",
+    "license": "Elastic-2.0",
+    "hosted_third_party_service_allowed": false,
+    "preserve_notices": true,
+    "backend_policy": "dedicated-supabase-project-required",
+    "runtime_policy": "isolated-service",
+    "routing_parent": "OmegaOmniRoute",
+    "governance_parent": [
+      "OmegaMissionControl",
+      "PEA",
+      "OmegaCSF"
+    ],
+    "consequential_actions": "human-approval-required",
+    "status_endpoint": "/status"
   },
   "free_ai_fabric": {
     "enabled": true,
