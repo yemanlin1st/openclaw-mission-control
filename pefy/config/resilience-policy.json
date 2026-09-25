@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "PEFY-OMEGA-RESILIENCE-BCDR",
+  "default_enabled": true,
+  "applies_retroactively": true,
+  "standards_alignment": [
+    "ISO 22301 business continuity principles",
+    "ISO/IEC 27001 information security continuity principles",
+    "ISO/IEC 27031 ICT readiness principles",
+    "ISO 31000 risk-based treatment principles"
+  ],
+  "default_profile": "tier2_standard_business",
+  "profiles": {
+    "tier0_control_plane": {
+      "rto_minutes": 15,
+      "rpo_minutes": 5,
+      "restore_test_days": 30,
+      "immutable_backup": true
+    },
+    "tier1_critical_business": {
+      "rto_minutes": 60,
+      "rpo_minutes": 15,
+      "restore_test_days": 30,
+      "immutable_backup": true
+    },
+    "tier2_standard_business": {
+      "rto_minutes": 240,
+      "rpo_minutes": 60,
+      "restore_test_days": 90,
+      "immutable_backup": false
+    },
+    "tier3_noncritical": {
+      "rto_minutes": 1440,
+      "rpo_minutes": 1440,
+      "restore_test_days": 180,
+      "immutable_backup": false
+    }
+  },
+  "mandatory_controls": {
+    "health_check": true,
+    "watchdog": true,
+    "dependency_timeouts": true,
+    "circuit_breaker": true,
+    "bounded_retries": true,
+    "idempotency_or_compensation": true,
+    "durable_queue_for_critical_async_work": true,
+    "checkpoint_resume": true,
+    "provider_fallback": true,
+    "local_or_offline_fallback_where_feasible": true,
+    "graceful_degradation": true,
+    "versioned_configuration": true,
+    "backup_integrity_verification": true,
+    "restore_testing": true,
+    "post_recovery_reconciliation": true,
+    "audit_evidence": true
+  },
+  "data_recovery": {
+    "strategy": "3-2-1-1-0",
+    "encryption_required": true,
+    "versioning_required": true,
+    "immutable_copy_for_tier0_tier1": true,
+    "restore_test_required": true,
+    "no_backup_success_without_restore_evidence": true,
+    "secret_redaction_required": true
+  },
+  "failure_semantics": {
+    "default": "fail-safe-not-fail-open",
+    "preserve_security_controls": true,
+    "preserve_human_approval_state": true,
+    "never_duplicate_non_idempotent_actions": true,
+    "queue_when_safe_execution_unavailable": true,
+    "manual_assisted_mode_for_critical_processes": true
+  },
+  "orchestration": {
+    "registry_required": true,
+    "dependency_graph_required": true,
+    "health_aware_routing": true,
+    "capability_substitution": true,
+    "single_point_of_failure_detection": true,
+    "cascading_failure_prevention": true
+  }
+}
