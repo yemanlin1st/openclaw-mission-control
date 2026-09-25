@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "graphify": {
+    "enabled": true,
+    "mode": "governed-adapter",
+    "upstream": "https://github.com/Graphify-Labs/graphify",
+    "package": "graphifyy",
+    "install_command": "python -m pip install graphifyy",
+    "verify_command": "graphify --help",
+    "outputs": [
+      "graphify-out/graph.json",
+      "graphify-out/graph.html",
+      "graphify-out/GRAPH_REPORT.md"
+    ],
+    "mcp_allowed": true,
+    "auto_watch": false,
+    "git_hook_allowed": true,
+    "policy": {
+      "proprietary_code": "local-ast-first",
+      "documents_and_images": "external-llm-only-after-policy-approval",
+      "provenance_required": true
+    }
+  },
+  "free_ai_fabric": {
+    "enabled": true,
+    "strategy": "local-first-then-authorized-free-tier",
+    "providers": [
+      "ollama",
+      "llama.cpp",
+      "vllm",
+      "gemini-free",
+      "groq-free",
+      "openrouter-free",
+      "huggingface-free"
+    ],
+    "secret_values_in_repo": false,
+    "premium_fallback": [
+      "openai",
+      "nvidia",
+      "google",
+      "anthropic"
+    ],
+    "route_dimensions": [
+      "privacy",
+      "risk",
+      "quality",
+      "latency",
+      "quota",
+      "context",
+      "tool_calling",
+      "modality",
+      "cost",
+      "availability"
+    ]
+  },
+  "dark_forest_safeguards": {
+    "enabled": true,
+    "governance_parent": [
+      "OmegaCSF",
+      "GARKAEL"
+    ],
+    "mode": "defensive-reference-profile",
+    "source": "https://github.com/slowmist/Blockchain-dark-forest-selfguard-handbook",
+    "principles": [
+      "zero-trust",
+      "continuous-security-validation",
+      "segregation",
+      "stop-loss-first",
+      "preserve-evidence"
+    ]
+  }
+}
