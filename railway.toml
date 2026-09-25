@@ -1,6 +1,6 @@
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile.pefy-capability-runtime"
+dockerfilePath = "Dockerfile.pefy-graphify-runtime"
 
 [deploy]
 healthcheckPath = "/health"
