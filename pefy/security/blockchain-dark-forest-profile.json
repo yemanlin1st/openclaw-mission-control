@@ -1,0 +1,74 @@
+{
+  "profile": "PEFY Blockchain Dark Forest Defensive Profile",
+  "version": "1.0",
+  "enabled": true,
+  "source": {
+    "title": "Blockchain Dark Forest Selfguard Handbook",
+    "author": "Cos / SlowMist Team",
+    "repository": "https://github.com/slowmist/Blockchain-dark-forest-selfguard-handbook",
+    "usage": "referenced and adapted defensive controls; no wholesale reproduction"
+  },
+  "control_domains": {
+    "identity_and_keys": [
+      "hardware-backed keys where appropriate",
+      "seed/private-key isolation",
+      "no secret sharing",
+      "recovery rehearsal",
+      "least-privilege signer roles"
+    ],
+    "wallet_operations": [
+      "separate hot/cold/test wallets",
+      "small-value trial transactions",
+      "address and chain verification",
+      "approval review before signing"
+    ],
+    "signatures": [
+      "decode and inspect requested permissions",
+      "reject blind signing where avoidable",
+      "limit token approvals",
+      "verify domain and contract identity"
+    ],
+    "defi_nft_web3": [
+      "protocol provenance checks",
+      "contract risk review",
+      "bridge risk review",
+      "allowance monitoring",
+      "phishing/domain defense"
+    ],
+    "endpoint_security": [
+      "OS/browser/mobile hardening",
+      "password manager",
+      "MFA",
+      "SIM-swap defenses",
+      "segregated profiles/devices"
+    ],
+    "supply_chain": [
+      "verify official sources",
+      "hash/signature verification when published",
+      "SBOM/provenance where available",
+      "dependency and extension review"
+    ],
+    "incident_response": [
+      "stop-loss first",
+      "isolate affected assets",
+      "preserve evidence",
+      "root-cause analysis",
+      "trace fund movement lawfully",
+      "credential/key rotation",
+      "post-incident lessons"
+    ],
+    "monitoring": [
+      "continuous security validation",
+      "anomaly alerts",
+      "wallet/approval monitoring",
+      "provider and smart-contract change monitoring"
+    ]
+  },
+  "mandatory_gates": {
+    "external_transfer": "human approval",
+    "new_smart_contract_interaction": "risk check",
+    "unlimited_token_approval": "deny-by-default",
+    "seed_or_private_key_export": "deny-by-default",
+    "irreversible_high_value_action": "two-person approval where supported"
+  }
+}
