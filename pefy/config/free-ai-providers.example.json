@@ -1,0 +1,59 @@
+{
+  "note": "Example registry only. Never commit API keys.",
+  "providers": {
+    "ollama": {
+      "enabled": true,
+      "category": "local",
+      "base_url": "http://127.0.0.1:11434",
+      "credentials": "none",
+      "privacy_tier": "sovereign"
+    },
+    "vllm": {
+      "enabled": true,
+      "category": "local-openai-compatible",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "credentials": "optional",
+      "privacy_tier": "sovereign"
+    },
+    "gemini_free": {
+      "enabled": true,
+      "category": "cloud-free-tier",
+      "secret_env": "GEMINI_API_KEY",
+      "privacy_tier": "external-restricted"
+    },
+    "groq_free": {
+      "enabled": true,
+      "category": "cloud-free-tier",
+      "secret_env": "GROQ_API_KEY",
+      "privacy_tier": "external-restricted"
+    },
+    "openrouter_free": {
+      "enabled": true,
+      "category": "cloud-free-router",
+      "secret_env": "OPENROUTER_API_KEY",
+      "model_selector": "openrouter/free",
+      "privacy_tier": "external-restricted"
+    },
+    "huggingface_free": {
+      "enabled": true,
+      "category": "cloud-free-tier",
+      "secret_env": "HF_TOKEN",
+      "privacy_tier": "external-restricted"
+    }
+  },
+  "routing": {
+    "confidential_or_proprietary": [
+      "ollama",
+      "vllm"
+    ],
+    "public_low_risk": [
+      "ollama",
+      "vllm",
+      "groq_free",
+      "openrouter_free",
+      "huggingface_free",
+      "gemini_free"
+    ],
+    "fallback_to_paid_only_when_policy_allows": true
+  }
+}
