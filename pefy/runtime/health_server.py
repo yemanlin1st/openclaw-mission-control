@@ -124,7 +124,13 @@ def run_checks():
     RESULT["agentswarms"] = verify_agentswarms()
     RESULT["supabase"] = verify_supabase()
     RESULT["providers"] = verify_providers()
-    core_ok = RESULT["graphify"].get("installed") and RESULT["agentswarms"].get("installed") and RESULT["agentswarms"].get("revision_verified")
+    core_ok = (
+        RESULT["graphify"].get("installed")
+        and RESULT["graphify"].get("execution_verified")
+        and RESULT["graphify"].get("graph_json_created")
+        and RESULT["agentswarms"].get("installed")
+        and RESULT["agentswarms"].get("revision_verified")
+    )
     RESULT["status"] = "ok" if core_ok else "degraded"
     RESULT["checked_at_unix"] = int(time.time())
     snapshot = Path("/opt/pefy/runtime-status.json")
@@ -151,7 +157,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/health":
-            self._write(200 if RESULT["status"] in {"ok", "initializing"} else 503, {"status": RESULT["status"], "uptime_seconds": int(time.time() - STARTED_AT)})
+            self._write(200 if RESULT["status"] == "ok" else 503, {"status": RESULT["status"], "uptime_seconds": int(time.time() - STARTED_AT)})
             return
         if self.path == "/status":
             safe = dict(RESULT)
