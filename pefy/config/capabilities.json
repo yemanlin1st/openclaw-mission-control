@@ -271,5 +271,45 @@
     },
     "skill": "pefy/skills/resilience/SKILL.md",
     "policy": "pefy/config/resilience-policy.json"
+  },
+  "pefy_omega_mcp": {
+    "enabled": true,
+    "criticality_tier": "tier1_critical_business",
+    "health_endpoint": "/readyz",
+    "current_runtime": {
+      "provider": "Railway",
+      "regions": [
+        "sfo"
+      ],
+      "replicas": 1,
+      "restart_policy": "on-failure",
+      "restart_max_retries": 5,
+      "persistent_volume": false,
+      "integrity_bootstrap": "sha256-verified environment payload"
+    },
+    "continuity": {
+      "fallback": [
+        "alternate governed MCP adapter",
+        "direct governed tool/API adapter",
+        "manual-assisted procedure"
+      ],
+      "state_rule": "transport runtime must not be authoritative store of business state",
+      "failover_preserves": [
+        "tenant",
+        "authorization",
+        "approval-state",
+        "evidence",
+        "idempotency-key"
+      ]
+    },
+    "recovery": {
+      "rebuildable": true,
+      "required_improvements": [
+        "independent source-of-truth copy of executable/config outside a single hosting control plane",
+        "secondary-region-or-provider capability before strict tier1 HA claim",
+        "tested reconstruction drill",
+        "documented owner and escalation route"
+      ]
+    }
   }
 }
