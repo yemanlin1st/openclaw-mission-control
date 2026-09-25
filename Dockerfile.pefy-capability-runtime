@@ -28,6 +28,10 @@ RUN git clone --filter=blob:none https://github.com/AgentSwarms-fyi/agentswarms.
  && npm ci \
  && node -e "const p=require('./package.json'); if(p.name!=='agentswarms') process.exit(2); console.log('AgentSwarms '+p.version+' installed')"
 
+RUN mkdir -p /opt/pefy \
+ && cd /opt/agentswarms \
+ && (npm audit --omit=dev --json > /opt/pefy/agentswarms-npm-audit-prod.json || true)
+
 COPY pefy/runtime/health_server.py /opt/pefy/health_server.py
 COPY pefy/runtime/fixture.py /opt/pefy/fixture.py
 
