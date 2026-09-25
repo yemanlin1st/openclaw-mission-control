@@ -1,0 +1,11 @@
+FROM python:3.12-slim
+ARG GRAPHIFY_VERSION=0.9.67
+ENV PYTHONUNBUFFERED=1 GRAPHIFY_VERSION=$GRAPHIFY_VERSION PORT=8080
+RUN python -m pip install --no-cache-dir --upgrade pip \
+ && python -m pip install --no-cache-dir "graphifyy==${GRAPHIFY_VERSION}" \
+ && graphify --help >/dev/null
+RUN mkdir -p /opt/pefy
+COPY pefy/runtime/graphify_health_server.py /opt/pefy/graphify_health_server.py
+COPY pefy/runtime/fixture.py /opt/pefy/fixture.py
+EXPOSE 8080
+CMD ["python","/opt/pefy/graphify_health_server.py"]
