@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0",
+  "generated_for": "current PEFY Omega capability fabric",
+  "purpose": "continuity and recoverability mapping",
+  "components": {
+    "OmegaMissionControl": {
+      "criticality": "tier0_control_plane",
+      "fallback": [
+        "secondary orchestrator path",
+        "manual-assisted mission dispatch"
+      ],
+      "required_state": [
+        "mission id",
+        "task graph",
+        "approval state",
+        "evidence refs"
+      ],
+      "recovery": "rebuild from versioned config and resume from checkpoints"
+    },
+    "OmegaOmniRoute": {
+      "criticality": "tier0_control_plane",
+      "fallback": [
+        "alternate authorized provider",
+        "local/self-hosted inference",
+        "cached/deferred execution"
+      ],
+      "continuity_rule": "provider outage must not terminate the mission when an authorized substitute exists"
+    },
+    "free_ai_fabric": {
+      "criticality": "tier0_control_plane",
+      "fallback": [
+        "local Ollama/llama.cpp/vLLM",
+        "alternate free provider",
+        "authorized premium provider",
+        "queued delayed execution"
+      ],
+      "data_loss_tolerance": "none for committed mission state"
+    },
+    "pefy_omega_mcp": {
+      "criticality": "tier1_critical_business",
+      "fallback": [
+        "alternate MCP/tool adapter",
+        "direct governed API adapter",
+        "manual-assisted procedure"
+      ],
+      "state_rule": "MCP transport must not be sole holder of business state"
+    },
+    "graphify": {
+      "criticality": "tier2_standard_business",
+      "fallback": [
+        "local AST parser",
+        "last-known-good graph artifact",
+        "regenerate from versioned source"
+      ],
+      "state_rule": "runtime is disposable; source and evidence remain authoritative"
+    },
+    "agentswarms": {
+      "criticality": "tier2_standard_business",
+      "state": "upstream runtime quarantined",
+      "fallback": [
+        "OmegaAgentSwarms governed adapter",
+        "OmegaMissionControl native swarm"
+      ],
+      "recovery_rule": "do not enable upstream until security, backend, backup and restore gates pass"
+    },
+    "dark_forest_safeguards": {
+      "criticality": "tier1_critical_business",
+      "fallback": [
+        "local defensive controls",
+        "incident runbook",
+        "manual containment"
+      ],
+      "evidence_preservation": true
+    }
+  },
+  "universal_recovery_sequence": [
+    "detect",
+    "isolate",
+    "select-safe-continuity-mode",
+    "failover-or-queue",
+    "preserve-evidence",
+    "restore-known-good-state",
+    "verify-integrity",
+    "replay-or-reconcile-in-flight-work",
+    "return-to-normal",
+    "post-incident-review"
+  ],
+  "current_engineering_gaps_to_close_before_strict_tier0_claim": [
+    "independent secondary hosting region/provider for control-plane services",
+    "live replicated durable mission checkpoint store",
+    "automated immutable backup lifecycle for all stateful stores",
+    "periodic automated restore drill with evidence",
+    "tested provider failover using valid provider credentials",
+    "formal owner/on-call/escalation matrix for every tier0/tier1 capability"
+  ]
+}
