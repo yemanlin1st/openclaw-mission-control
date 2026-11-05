@@ -6,6 +6,8 @@ on:
       - 'pefy/runtime/graphify_health_server.py'
       - 'pefy/runtime/health_server.py'
       - 'pefy/integrations/public_api_gateway.py'
+      - 'pefy/integrations/omega_service_contract.py'
+      - 'tests/test_omega_service_contract.py'
       - 'tests/test_mcp_readiness_probe.py'
       - 'tests/test_public_api_gateway.py'
       - '.github/workflows/pefy-isolated-security-tests.yml'
@@ -22,6 +24,6 @@ jobs:
         with:
           python-version: '3.12'
       - name: Syntax checks
-        run: python -m compileall -q pefy/runtime/mcp_readiness_probe.py pefy/runtime/graphify_health_server.py pefy/runtime/health_server.py pefy/integrations/public_api_gateway.py
+        run: python -m compileall -q pefy/runtime/mcp_readiness_probe.py pefy/runtime/graphify_health_server.py pefy/runtime/health_server.py pefy/integrations/public_api_gateway.py pefy/integrations/omega_service_contract.py
       - name: Isolated tests (no external network calls)
-        run: python -m unittest discover -s tests -p 'test_*gateway.py' && python -m unittest discover -s tests -p 'test_mcp_readiness_probe.py'
+        run: python -m unittest discover -s tests -p 'test_*gateway.py' && python -m unittest discover -s tests -p 'test_mcp_readiness_probe.py' && python -m unittest discover -s tests -p 'test_omega_service_contract.py'
