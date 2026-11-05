@@ -17,6 +17,12 @@ class GatewayTests(unittest.TestCase):
     def test_reject_unapproved_host(self):
         with self.assertRaises(ValueError):
             api.fetch_public_json("https://example.com/")
+    def test_reject_nonstandard_port(self):
+        with self.assertRaises(ValueError):
+            api.fetch_public_json("https://api.worldbank.org:8443/")
+    def test_reject_fragment(self):
+        with self.assertRaises(ValueError):
+            api.fetch_public_json("https://api.worldbank.org/#fragment")
     def test_reject_embedded_credentials(self):
         with self.assertRaises(ValueError):
             api.fetch_public_json("https://user:password@api.worldbank.org/")
