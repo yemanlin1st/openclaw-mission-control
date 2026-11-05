@@ -80,9 +80,9 @@ class H(BaseHTTPRequestHandler):
         if self.path=="/health":
             self.sendj(200 if RESULT["status"]=="ok" else 503,{"status":RESULT["status"],"uptime_seconds":int(time.time()-STARTED_AT)}); return
         if self.path=="/status":
-            self.sendj(200,{**RESULT,"uptime_seconds":int(time.time()-STARTED_AT)}); return
+            self.sendj(200,{"status":RESULT["status"],"graphify_execution_verified":RESULT["graphify"].get("execution_verified",False),"uptime_seconds":int(time.time()-STARTED_AT)}); return
         if self.path=="/refresh":
-            threading.Thread(target=run_checks,daemon=True).start(); self.sendj(202,{"status":"refreshing"}); return
+            self.sendj(403,{"error":"refresh_disabled"}); return
         self.sendj(404,{"error":"not_found"})
     def log_message(self,fmt,*args): print("health_http",fmt%args,flush=True)
 
