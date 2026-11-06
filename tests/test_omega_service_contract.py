@@ -10,7 +10,16 @@ spec.loader.exec_module(module)
 class ContractTests(unittest.TestCase):
     def test_missing_configuration_fails_closed(self):
         report = module.readiness({})
-        self.assertTrue(all(not entry["ready"] for entry in report.values()))
+        self.assertTrue(all(not entry["configured"] for entry in report.values()))
+    def test_configuration_is_not_live_verification(self):
+        env = {key: "configured" for keys in module.REQUIRED.values() for key in keys}
+        env["CLERK_JWKS_URL"] = "https://clerk.example.com/jwks"
+        env["CLERK_ISSUER"] = "https://clerk.example.com"
+        env["RUFLO_MCP_URL"] = "https://ruflo.example.com/mcp"
+        report = module.readiness(env)
+        self.assertTrue(all(entry["configured"] for entry in report.values()))
+        self.assertTrue(all(not entry["verified_live"] for entry in report.values()))
+
     def test_r2_is_single_s3_compatible_service(self):
         self.assertIn("r2_s3", module.REQUIRED)
         self.assertNotIn("r2", module.REQUIRED)
