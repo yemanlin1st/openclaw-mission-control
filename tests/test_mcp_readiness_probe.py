@@ -16,6 +16,25 @@ class ReadinessTests(unittest.TestCase):
         finally:
             probe.UPSTREAM = old
 
+    def test_loopback_userinfo_rejected(self):
+        old = probe.UPSTREAM
+        try:
+            probe.UPSTREAM = "http://evil@localhost:8080/readyz"
+            self.assertFalse(probe.upstream_ready())
+        finally:
+            probe.UPSTREAM = old
+
+    def test_loopback_redirect_not_followed(self):
+        from unittest.mock import patch
+        old = probe.UPSTREAM
+        try:
+            probe.UPSTREAM = "http://127.0.0.1:8080/readyz"
+            with patch.object(probe.urllib.request, "build_opener") as mocked:
+                mocked.return_value.open.side_effect = probe.urllib.error.HTTPError(probe.UPSTREAM, 302, "redirect", {}, None)
+                self.assertFalse(probe.upstream_ready())
+        finally:
+            probe.UPSTREAM = old
+
     def test_external_upstream_rejected(self):
         old = probe.UPSTREAM
         try:
