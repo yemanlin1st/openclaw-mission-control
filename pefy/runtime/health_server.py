@@ -160,13 +160,10 @@ class Handler(BaseHTTPRequestHandler):
             self._write(200 if RESULT["status"] == "ok" else 503, {"status": RESULT["status"], "uptime_seconds": int(time.time() - STARTED_AT)})
             return
         if self.path == "/status":
-            safe = dict(RESULT)
-            safe["uptime_seconds"] = int(time.time() - STARTED_AT)
-            self._write(200, safe)
+            self._write(200, {"status": RESULT["status"], "uptime_seconds": int(time.time() - STARTED_AT)})
             return
         if self.path == "/refresh":
-            threading.Thread(target=run_checks, daemon=True).start()
-            self._write(202, {"status": "refreshing"})
+            self._write(403, {"error": "refresh_disabled"})
             return
         self._write(404, {"error": "not_found"})
 
