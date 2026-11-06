@@ -35,6 +35,21 @@ class ReadinessTests(unittest.TestCase):
         finally:
             probe.UPSTREAM = old
 
+    def test_reject_redirect_and_userinfo(self):
+        old = probe.UPSTREAM
+        try:
+            for candidate in (
+                "http://127.0.0.1:8080/readyz?redirect=1",
+                "http://user@127.0.0.1:8080/readyz",
+                "http://localhost:8080/readyz#fragment",
+                "http://localhost:8080.evil.org/readyz",
+                "http://localhost:8080/other",
+            ):
+                probe.UPSTREAM = candidate
+                self.assertFalse(probe.upstream_ready(), candidate)
+        finally:
+            probe.UPSTREAM = old
+
     def test_external_upstream_rejected(self):
         old = probe.UPSTREAM
         try:
