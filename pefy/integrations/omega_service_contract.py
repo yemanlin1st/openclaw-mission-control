@@ -1,6 +1,6 @@
-"""Fail-closed configuration contract for isolated PEFY integration services.
+"""Configuration inventory for isolated PEFY integration services.
 
-No secrets are printed, and missing provider configuration never implies readiness.
+No secrets are printed. Configuration presence never implies live service readiness.
 """
 import os
 from urllib.parse import urlsplit
@@ -27,7 +27,7 @@ def readiness(env=None):
                 parsed = urlsplit(env[key])
                 if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
                     invalid.append(key)
-        report[service] = {"ready": not missing and not invalid, "missing": missing, "invalid": invalid}
+        report[service] = {"configured": not missing and not invalid, "verified_live": False, "missing": missing, "invalid": invalid}
     return report
 
 if __name__ == "__main__":
