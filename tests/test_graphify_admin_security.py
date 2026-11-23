@@ -9,7 +9,7 @@ from http.client import HTTPConnection
 from http.server import ThreadingHTTPServer
 from unittest.mock import patch
 
-MODULE_PATH = Path(__file__).resolve().parents[3] / "pefy" / "runtime" / "graphify_health_server.py"
+MODULE_PATH = Path(__file__).resolve().parents[1] / "pefy" / "runtime" / "graphify_health_server.py"
 spec = importlib.util.spec_from_file_location("graphify_health_under_test", MODULE_PATH)
 target = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(target)
