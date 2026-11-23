@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, os, shutil, subprocess, tempfile, threading, time, urllib.error, urllib.request
+import hmac, json, os, shutil, subprocess, tempfile, threading, time, urllib.error, urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -72,18 +72,65 @@ def run_checks():
       "provider_credentials":{k:v.get("credential_present",v.get("configured")) for k,v in RESULT["providers"].items()}
     },sort_keys=True),flush=True)
 
+# Only a minimal /health endpoint is public. Administrative diagnostics and
+# refresh operations require a separately provisioned high-entropy secret.
+_REFRESH_LOCK = threading.Lock()
+
+def _start_refresh():
+    try:
+        run_checks()
+    finally:
+        _REFRESH_LOCK.release()
+
 class H(BaseHTTPRequestHandler):
     def sendj(self,code,obj):
         raw=json.dumps(obj,indent=2,sort_keys=True).encode()
         self.send_response(code); self.send_header("Content-Type","application/json"); self.send_header("Cache-Control","no-store"); self.send_header("Content-Length",str(len(raw))); self.end_headers(); self.wfile.write(raw)
+    def admin_authorized(self):
+        expected=os.getenv("PEFY_GRAPHIFY_ADMIN_TOKEN","")
+        if not expected:
+            self.sendj(503,{"error":"admin_unconfigured"})
+            return False
+        provided=self.headers.get("Authorization","")
+        if not hmac.compare_digest(provided,"Bearer "+expected):
+            self.send_headerless_denial()
+            return False
+        return True
+    def send_headerless_denial(self):
+        self.send_response(401)
+        self.send_header("WWW-Authenticate",'Bearer realm="graphify-admin"')
+        self.send_header("Cache-Control","no-store")
+        self.send_header("Content-Length","0")
+        self.end_headers()
     def do_GET(self):
         if self.path=="/health":
-            self.sendj(200 if RESULT["status"]=="ok" else 503,{"status":RESULT["status"],"uptime_seconds":int(time.time()-STARTED_AT)}); return
+            self.sendj(200 if RESULT["status"]=="ok" else 503,{"status":RESULT["status"],"uptime_seconds":int(time.time()-STARTED_AT)})
+            return
         if self.path=="/status":
-            self.sendj(200,{**RESULT,"uptime_seconds":int(time.time()-STARTED_AT)}); return
+            if not self.admin_authorized():
+                return
+            self.sendj(200,{**RESULT,"uptime_seconds":int(time.time()-STARTED_AT)})
+            return
         if self.path=="/refresh":
-            threading.Thread(target=run_checks,daemon=True).start(); self.sendj(202,{"status":"refreshing"}); return
+            self.sendj(405,{"error":"method_not_allowed"})
+            return
         self.sendj(404,{"error":"not_found"})
+    def do_POST(self):
+        if self.path!="/refresh":
+            self.sendj(404,{"error":"not_found"})
+            return
+        if not self.admin_authorized():
+            return
+        if not _REFRESH_LOCK.acquire(blocking=False):
+            self.sendj(409,{"error":"refresh_in_progress"})
+            return
+        try:
+            threading.Thread(target=_start_refresh,daemon=True).start()
+        except Exception:
+            _REFRESH_LOCK.release()
+            self.sendj(500,{"error":"refresh_start_failed"})
+            return
+        self.sendj(202,{"status":"refreshing"})
     def log_message(self,fmt,*args): print("health_http",fmt%args,flush=True)
 
 if __name__=="__main__":
