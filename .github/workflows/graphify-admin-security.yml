@@ -1,0 +1,30 @@
+name: Graphify admin endpoint security
+
+on:
+  push:
+    branches:
+      - fix/graphify-admin-endpoints-20261123
+  pull_request:
+    paths:
+      - 'pefy/runtime/graphify_health_server.py'
+      - 'tests/test_graphify_admin_security.py'
+      - '.github/workflows/graphify-admin-security.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  graphify-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile and run fail-closed HTTP tests
+        run: |
+          python -m py_compile pefy/runtime/graphify_health_server.py tests/test_graphify_admin_security.py
+          python -W error -m unittest discover -s tests -p 'test_graphify_admin_security.py' -v
